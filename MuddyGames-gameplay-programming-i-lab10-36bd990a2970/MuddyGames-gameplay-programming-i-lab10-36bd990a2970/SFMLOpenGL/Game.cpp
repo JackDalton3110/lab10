@@ -57,8 +57,8 @@ GLuint	index,		//Index to draw
 		textureID,	//Texture ID
 		texelID;	// Texel ID
 
-const string filename = "minecraft.tga";
-//const string filename = "cube.tga";
+//const string filename = "minecraft.tga";
+const string filename = "cube.tga";
 
 //const string filename = "texture.tga";
 
@@ -201,18 +201,8 @@ void Game::initialize()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	/* Vertex Shader which would normally be loaded from an external file */
-	const char* vs_src = "#version 400\n\r"
-		"in vec4 sv_position;"
-		"in vec4 sv_color;"
-		"in vec2 sv_texel;"
-		"out vec4 color;"
-		"out vec2 texel;"
-		"void main() {"
-		"	color = sv_color;"
-		"	texel = sv_texel;"
-		"	gl_Position = sv_position;"
-		"}"; //Vertex Shader Src
-
+	string shading = readShade();
+	const char* vs_src = shading.c_str();
 	DEBUG_MSG("Setting Up Vertex Shader");
 
 	vsid = glCreateShader(GL_VERTEX_SHADER); //Create Shader and set ID
@@ -232,15 +222,8 @@ void Game::initialize()
 	}
 
 	/* Fragment Shader which would normally be loaded from an external file */
-	const char* fs_src = "#version 400\n\r"
-		"uniform sampler2D f_texture;"
-		"in vec4 color;"
-		"in vec2 texel;"
-		"out vec4 fColor;"
-		"void main() {"
-		//"	fColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);"
-		"	fColor = texture(f_texture, texel.st);"
-		"}"; //Fragment Shader Src
+	string fragment = readFragment();
+	const char* fs_src = fragment.c_str();
 
 	DEBUG_MSG("Setting Up Fragment Shader");
 
@@ -347,22 +330,24 @@ void Game::update()
 	}
 
 	//Change vertex data
-	vertex[0].coordinate[0] += -0.0001f;
-	vertex[0].coordinate[1] += -0.0001f;
-	vertex[0].coordinate[2] += -0.0001f;
-
-	vertex[1].coordinate[0] += -0.0001f;
-	vertex[1].coordinate[1] += -0.0001f;
-	vertex[1].coordinate[2] += -0.0001f;
-
-	vertex[2].coordinate[0] += -0.0001f;
-	vertex[2].coordinate[1] += -0.0001f;
-	vertex[2].coordinate[2] += -0.0001f;
-
-	vertex[3].coordinate[0] += -0.0001f;
-	vertex[3].coordinate[1] += -0.0001f;
-	vertex[3].coordinate[2] += -0.0001f;
-
+	if (sf::Keyboard::isKeyPressed(Keyboard::A))
+	{
+		vertex[0].coordinate[0] += -0.0001f;
+		vertex[0].coordinate[1] += -0.0001f;
+		vertex[0].coordinate[2] += -0.0001f;
+		
+		vertex[1].coordinate[0] += -0.0001f;
+		vertex[1].coordinate[1] += -0.0001f;
+		vertex[1].coordinate[2] += -0.0001f;
+		
+		vertex[2].coordinate[0] += -0.0001f;
+		vertex[2].coordinate[1] += -0.0001f;
+		vertex[2].coordinate[2] += -0.0001f;
+		
+		vertex[3].coordinate[0] += -0.0001f;
+		vertex[3].coordinate[1] += -0.0001f;
+		vertex[3].coordinate[2] += -0.0001f;
+	}
 #if (DEBUG >= 2)
 	DEBUG_MSG("Update up...");
 #endif
@@ -421,3 +406,40 @@ void Game::unload()
 	stbi_image_free(img_data); //Free image
 }
 
+
+String Game::readShade()
+{
+
+	string line;
+	string shading;
+	ifstream myfile("../Shaders.txt");
+
+	if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			shading += line + "\n";
+		}
+		myfile.close();
+	}
+	
+
+	return shading;
+}
+
+String Game::readFragment()
+{
+	string line;
+	string fragment;
+	ifstream myfile("../Fragment.txt");
+
+	if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			fragment += line + "\n";
+		}
+		myfile.close();
+	}
+	return fragment;
+}
